@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {numbers,draw,password,teams,parseList,randomInt} from '../dist/core.js';
+test('integer range supports negative boundaries and singleton',()=>{assert.equal(randomInt(-5,-5),-5);for(let i=0;i<1000;i++){const n=randomInt(-10,10);assert.ok(n>=-10&&n<=10&&Number.isInteger(n));}assert.throws(()=>randomInt(2,1));assert.throws(()=>randomInt(0,2**32));});
+test('unique sampling handles the full range and huge sparse ranges',()=>{assert.deepEqual(numbers(-2,2,5).sort((a,b)=>a-b),[-2,-1,0,1,2]);const sample=numbers(-1e9,1e9,1000);assert.equal(new Set(sample).size,1000);assert.throws(()=>numbers(1,2,3));assert.equal(numbers(7,7,4,false).join(','),'7,7,7,7');});
+test('lists trim and deduplicate; draw rejects impossible counts',()=>{assert.deepEqual(parseList(' Аня\n\nМиша\r\nАня '),['Аня','Миша']);const winners=draw('Аня\nМиша\nАня',2);assert.equal(new Set(winners).size,2);assert.throws(()=>draw('Аня',2));assert.throws(()=>draw('',1));});
+test('passwords satisfy every requested character class',()=>{for(let i=0;i<100;i++){const p=password(20,{lower:true,upper:true,digits:true,symbols:true});assert.equal(p.length,20);for(const re of [/[a-z]/,/[A-Z]/,/[2-9]/,/[!@#$%&*+\-=?]/])assert.match(p,re);}assert.throws(()=>password(16,{}));assert.throws(()=>password(7,{lower:true}));});
+test('teams preserve each participant and have balanced sizes',()=>{const out=teams('a\nb\nc\nd\ne\nf\ng',3);assert.equal(out.flat().length,7);assert.equal(new Set(out.flat()).size,7);assert.ok(Math.max(...out.map(x=>x.length))-Math.min(...out.map(x=>x.length))<=1);assert.throws(()=>teams('a\nb',3));});
