@@ -1,8 +1,8 @@
 const colors = [
-  {id:'violet', name:'Фиолетовый', swatch:'#7861e6'},
-  {id:'red', name:'Красный', swatch:'#cf3f53'},
-  {id:'green', name:'Зелёный', swatch:'#168265'},
-  {id:'blue', name:'Синий', swatch:'#3068d4'}
+  {id:'violet', name:'Фиолетовый', swatch:'#6b50d7'},
+  {id:'red', name:'Красный', swatch:'#b72e45'},
+  {id:'green', name:'Зелёный', swatch:'#126f51'},
+  {id:'blue', name:'Синий', swatch:'#255ac2'}
 ];
 
 export function initAppearance(tg, openModal) {
@@ -40,9 +40,9 @@ export function initAppearance(tg, openModal) {
     openModal('Оформление', `
       <fieldset class="appearance-group"><legend>Режим</legend>
         <div class="mode-options">
-          ${[['light','Светлый','☀'],['dark','Тёмный','☾']].map(([id,name,symbol]) => `
+          ${[['light','Светлый'],['dark','Тёмный']].map(([id,name]) => `
             <label class="mode-option"><input type="radio" name="appearance-mode" value="${id}" ${mode===id?'checked':''}>
-              <span><span class="mode-symbol" aria-hidden="true">${symbol}</span>${name}<span class="appearance-check" aria-hidden="true">✓</span></span>
+              <span>${name}<span class="appearance-check" aria-hidden="true">✓</span></span>
             </label>`).join('')}
         </div>
       </fieldset>
@@ -54,7 +54,7 @@ export function initAppearance(tg, openModal) {
             </label>`).join('')}
         </div>
       </fieldset>
-      <p class="appearance-hint">Цвет работает в обоих режимах. Выбор сохраняется на этом устройстве.</p>
+      <p class="appearance-hint">Настройки сохраняются на этом устройстве.</p>
       <button class="primary-button" data-action="close">Готово</button>
     `);
   }

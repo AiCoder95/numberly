@@ -23,7 +23,9 @@ jobs:
       - name: Test generators
         run: node --test tests/*.test.mjs
       - name: Check browser script syntax
-        run: node --check dist/app.js
+        run: |
+          node --check dist/app.js
+          node --check dist/appearance.js
 
   deploy:
     needs: test
