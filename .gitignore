@@ -1,7 +1,10 @@
 node_modules/
+.tools/
+.wrangler/
 .env
 .env.*
 !.env.example
+.dev.vars*
 .openai/
 *.log
 *.tar.gz
