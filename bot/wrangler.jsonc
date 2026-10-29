@@ -1,6 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
   "name": "numberly-bot",
-  "main": "worker.js",
-  "compatibility_date": "2026-10-29"
+  "main": "runtime.js",
+  "compatibility_date": "2026-10-29",
+  "durable_objects": {"bindings": [{"name": "UPDATE_DEDUP", "class_name": "UpdateDeduplicator"}]},
+  "exports": {"UpdateDeduplicator": {"type": "durable-object", "storage": "sqlite"}},
+  "secrets": {"required": ["WEBHOOK_SECRET"]}
 }

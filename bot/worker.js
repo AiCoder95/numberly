@@ -24,7 +24,7 @@ const answers = {
   teams: 'В разделе «Команды» введите участников — по одному на строку — и укажите число команд. Приложение распределит участников случайно и постарается сделать команды одинакового размера.',
   coin: 'В разделе «Монетка» укажите количество бросков и нажмите «Подбросить монетку». Для каждого броска появится орёл или решка.',
   history: 'История открывается кнопкой в верхней части приложения. Она хранится на текущем устройстве и не переносится на другие устройства. В истории доступны последние 30 результатов; пароли не сохраняются.',
-  privacy: 'Списки и результаты обрабатываются в браузере. История хранится на текущем устройстве; её можно очистить в приложении. Пароли в историю не записываются.\n\nНе отправляйте пароли и списки участников в чат бота.',
+  privacy: 'Списки и результаты обрабатываются в браузере. История хранится на текущем устройстве; её можно очистить в приложении. Пароли в историю не записываются.\n\nДля защиты от повторных ответов бот временно хранит технические идентификаторы событий и хэши идентификаторов сообщений. Тексты сообщений не сохраняются.\n\nНе отправляйте пароли и списки участников в чат бота.',
   unknown: 'Я отвечаю на вопросы о работе Numberly. Выберите тему в меню или напишите, что именно хотите сделать.'
 };
 
@@ -65,7 +65,17 @@ export default {
     if (message?.chat?.type !== 'private' || !Number.isSafeInteger(message.chat.id) || typeof message.text !== 'string') {
       return new Response('OK');
     }
+    if (!Number.isSafeInteger(update.update_id) || !Number.isSafeInteger(message.message_id)) return new Response('OK');
     const answer = answers[topicFor(message.text)];
-    return Response.json({method:'sendMessage', chat_id:message.chat.id, text:answer, reply_markup:keyboard});
+    // Store only a digest of the message identity, never the chat ID or message text.
+    const identity = new TextEncoder().encode(`${message.chat.id}:${message.message_id}`);
+    const digest = await crypto.subtle.digest('SHA-256', identity);
+    const messageHash = Array.from(new Uint8Array(digest), n=>n.toString(16).padStart(2,'0')).join('');
+    const dedup = env.UPDATE_DEDUP.getByName('telegram-updates');
+    return dedup.fetch('https://dedup.internal/', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body:JSON.stringify({updateId:update.update_id, messageHash,
+        reply:{method:'sendMessage', chat_id:message.chat.id, text:answer, reply_markup:keyboard}})
+    });
   }
 };
